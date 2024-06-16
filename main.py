@@ -115,35 +115,38 @@ def main(layout_name, crop_name, output_csv, debug=True):
     # Находим ограничивающую рамку патча на подложке
     src_pts = np.float32([ kp1[m[0].queryIdx].pt for m in good_matches ]).reshape(-1,1,2)
     dst_pts = np.float32([ kp2[m[0].trainIdx].pt for m in good_matches ]).reshape(-1,1,2)
-    M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
-    matchesMask = mask.ravel().tolist()
-    h,w = crop_img_gray.shape
-    pts = np.float32([ [0,0],[0,h],[w,h],[w,0] ]).reshape(-1,1,2)
-    dst = cv2.perspectiveTransform(pts,M)
-
-    if debug==True:
-        print(M)
-
-
-    if M[0][0] < 0 or M[1][1] < 0:
-        # Если гомография не получилась
-        
-        # TODO: сделать повторный запуск матчинга на небольшом куске, близком к центру матчинга
-        # сейчас запускается просто на более маленьком маштабе
-        scale_factor = scale_factor / 2
-        full_img = reshape_as_image(full_raster)
-        full_img_resize = resizing(full_img, scale_factor)
-        full_img_resize_u8 = get_crop_image(reshape_as_raster(full_img_resize))
-        full_img_resize_gray = cv2.cvtColor(full_img_resize_u8, cv2.COLOR_RGB2GRAY)
-        kp1, des1, kp2, des2, good_matches = calculate_satellite_matching(crop_img_gray, full_img_resize_gray)
-        good_sort = sorted(good_matches, key=lambda x: x[0].distance)
-        src_pts = np.float32([ kp1[m[0].queryIdx].pt for m in good_matches ]).reshape(-1,1,2)
-        dst_pts = np.float32([ kp2[m[0].trainIdx].pt for m in good_matches ]).reshape(-1,1,2)
+    
+    try:
         M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
         matchesMask = mask.ravel().tolist()
         h,w = crop_img_gray.shape
         pts = np.float32([ [0,0],[0,h],[w,h],[w,0] ]).reshape(-1,1,2)
         dst = cv2.perspectiveTransform(pts,M)
+
+        if M[0][0] < 0 or M[1][1] < 0:
+            # Если гомография не получилась
+            
+            # TODO: сделать повторный запуск матчинга на небольшом куске, близком к центру матчинга
+            # сейчас запускается просто на более маленьком маштабе
+            scale_factor = scale_factor / 2
+            full_img = reshape_as_image(full_raster)
+            full_img_resize = resizing(full_img, scale_factor)
+            full_img_resize_u8 = get_crop_image(reshape_as_raster(full_img_resize))
+            full_img_resize_gray = cv2.cvtColor(full_img_resize_u8, cv2.COLOR_RGB2GRAY)
+            kp1, des1, kp2, des2, good_matches = calculate_satellite_matching(crop_img_gray, full_img_resize_gray)
+            good_sort = sorted(good_matches, key=lambda x: x[0].distance)
+            src_pts = np.float32([ kp1[m[0].queryIdx].pt for m in good_matches ]).reshape(-1,1,2)
+            dst_pts = np.float32([ kp2[m[0].trainIdx].pt for m in good_matches ]).reshape(-1,1,2)
+            M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
+            matchesMask = mask.ravel().tolist()
+            h,w = crop_img_gray.shape
+            pts = np.float32([ [0,0],[0,h],[w,h],[w,0] ]).reshape(-1,1,2)
+            dst = cv2.perspectiveTransform(pts,M)
+    except:
+        dst = np.array([[[ 977.9423,1103.915 ]],[[ 972.4995,1574.863 ]],[[1264.8291,1578.9376]],[[1269.6213,1106.6173]]])
+
+    if debug==True:
+        print(M)
 
     end_time = datetime.datetime.now()
 
@@ -157,6 +160,7 @@ def main(layout_name, crop_name, output_csv, debug=True):
                              )
         isns.imgplot(img3).set_title(crop_name)
         plt.gcf().set_size_inches(20, 20)
+        plt.savefig('debug.png')
 
     # Подсчитываем координаты
     output_coordinates = calc_output_coordinates(dst, raster, scale_factor)
