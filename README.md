@@ -1,6 +1,7 @@
 # lct24_hack
 
-## Запуск с помощью скрипта main.py
+
+## Запуск процедуры геопривязки с помощью скрипта `main.py`
 
 Для запуска процедуры получения координат воспользуйтесь скриптом `main.py`:
  ```bash
@@ -27,4 +28,10 @@ docker run --shm-size 8G --name satt -v .\:/app -t satt_app:latest --crop_name c
 ```bash
 docker run --shm-size 16G --name satt -v ./:/app -t satt_app:latest --crop_name crops/crop_0_0_0000.tif --layout_name layouts/layout_2021-08-16.tif
 ```
-После этого, в папке `result`, рядом с файлом `main.py`, создастся файл `coords.csv` в требуемом формате.
+
+## Запуск процедуры поиска испорченых пикселей с помощью скрипта `pixels_detection.py`
+
+Для запуска процедуры получения координат испорченных пикселей и исправленного изображения воспользуйтесь скриптом `pixels_detection.py`:
+
+`python pixels_detection.py --crop_name "D:\satellite_hackathon\18. Sitronics\1_20\crop_0_0_0000.tif" [--output_tif output_0_0.tiff --output_txt output_0_0.txt]`
+
