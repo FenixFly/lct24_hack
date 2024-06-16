@@ -9,6 +9,7 @@ from rasterio.plot import reshape_as_image, reshape_as_raster
 import argparse
 import pandas as pd
 import datetime
+from pathlib import Path
 
 
 def cli_argument_parser():
@@ -27,7 +28,7 @@ def cli_argument_parser():
     parser.add_argument('--output_csv',
                         type=str,
                         help='Path to output file .csv file',
-                        default='coords.csv',
+                        default='result/coords.csv',
                         required=False)
     args = parser.parse_args()
 
@@ -178,5 +179,6 @@ def main(layout_name, crop_name, output_csv, debug=True):
 
 if __name__=='__main__':
     args = cli_argument_parser()
+    Path(args.output_csv).parent.mkdir(parents=True, exist_ok=True)
     main(args.layout_name, args.crop_name, args.output_csv, debug=True)
 
