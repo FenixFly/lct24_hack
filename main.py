@@ -27,7 +27,7 @@ def cli_argument_parser():
     parser.add_argument('--output_csv',
                         type=str,
                         help='Path to output file .csv file',
-                        default='coords.csv',
+                        default='result/coords.csv',
                         required=False)
     args = parser.parse_args()
 
