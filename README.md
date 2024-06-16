@@ -25,6 +25,6 @@ docker run --shm-size 8G --name satt -v .\:/app -t satt_app:latest --crop_name c
 
 Для докера в `Linux`:
 ```bash
-docker run --shm-size 8G --name satt -v ./:/app -t satt_app:latest --crop_name crops/crop_0_0_0000.tif --layout_name layouts/layout_2021-08-16.tif
+docker run --shm-size 16G --name satt -v ./:/app -t satt_app:latest --crop_name crops/crop_0_0_0000.tif --layout_name layouts/layout_2021-08-16.tif
 ```
 После этого, в папке `result`, рядом с файлом `main.py`, создастся файл `coords.csv` в требуемом формате.
